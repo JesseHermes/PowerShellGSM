@@ -217,7 +217,7 @@ function Start-ServerPrep {
   # Write the default config to it.
   Write-ScriptMsg "Writing configuration to $($Server.ConfigFolder)\enshrouded_server.json"
 
-  $content = $json | ConvertTo-Json | Format-Json -Indentation 4
+  $content = $json | ConvertTo-Json -Depth 10
 
   Set-Content -Path "$($Server.ConfigFolder)/enshrouded_server.json" -Value $content
 
