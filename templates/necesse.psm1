@@ -131,7 +131,7 @@ $BackupsDetails = @{
   Weeks = 4
 
   #Folder to include in backup
-  Saves = "$($Server.DataDirectory)\saves"
+  Saves = "$($Server.Path)\saves"
 
   #Exclusions (Regex use | as separator)
   Exclusions = ""
