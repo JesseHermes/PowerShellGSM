@@ -1,10 +1,11 @@
 # Shared Variables for Scripts
+
 Copy the shared file to the **config/shared** folder
 
 ## Ark Survival Ascended
 
 ```json
-ark_shared.json - Duplicate this file if hosting multiple clusters.
+asa_shared.json - Duplicate this file if hosting multiple clusters.
 {
   // Login username used by SteamCMD
   "Login": "anonymous",

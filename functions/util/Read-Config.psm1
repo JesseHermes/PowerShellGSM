@@ -17,5 +17,8 @@ function Read-Config {
   if ($Server.ArgumentList.length -gt 0) {
     Add-Member -InputObject $Server -Name "Arguments" -Type NoteProperty -Value ((Optimize-ArgumentList -Arguments $Server.ArgumentList) -join "")
   }
+
+  #Named pipe used by the StdIn Warnings protocol to reach a server's console after launch.
+  Add-Member -InputObject $Server -Name "PipeName" -Type NoteProperty -Value "PowerShellGSM_$($Server.Name)"
 }
 Export-ModuleMember -Function Read-Config

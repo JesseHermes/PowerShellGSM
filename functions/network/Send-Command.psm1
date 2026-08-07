@@ -36,6 +36,11 @@ function Send-Command {
       }
     }
 
+    "StdIn" {
+      #send command through the named pipe held open by the StdIn host process.
+      $Success = Send-StdIn -Command "$Command $Message".Trim() -PipeName $Server.PipeName
+    }
+
     "Websocket" {
       #send Websocket command.
       $Result = Invoke-Websocket -Uri "ws://$($Server.ManagementIP):$($Server.ManagementPort)/websocket" -Message "$Command $Message" -Password $Server.ManagementPassword -Timeout 10 -ErrorAction SilentlyContinue
