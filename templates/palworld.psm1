@@ -40,8 +40,9 @@ $ServerDetails = @{
   #Rcon / Admin Password
   ManagementPassword = "CHANGEMETOO"
 
-  #Enable the REST API (separate from RCON, used by third party tools)
-  UseRestApi         = $false
+  #Enable the REST API. Required by the default restart warnings protocol below,
+  #and the replacement for RCON which Palworld has deprecated.
+  UseRestApi         = $true
 
   #REST API listening port
   RestApiPort        = 8212
@@ -165,25 +166,36 @@ $BackupsDetails = @{
 $Backups = New-Object -TypeName PsObject -Property $BackupsDetails
 
 #---------------------------------------------------------
-# Restart Warnings (Require RCON, Telnet or WebSocket API)
+# Restart Warnings (Require RCON, Telnet, StdIn or REST API)
 #---------------------------------------------------------
 
+<#
+Palworld RCON is deprecated and the developers have stated it is scheduled to
+stop functioning in an upcoming update. It also truncates messages containing
+multi byte characters. The REST API is the supported replacement, so this
+template defaults to it. Set UseRestApi = $true in the Server Configuration
+section above for this to work.
+
+To go back to RCON, set Protocol to "ARRCON" and replace the spaces in
+MessageMin / MessageSec with underscores, as the RCON Broadcast command splits
+its argument on the first space.
+#>
+
 $WarningsDetails = @{
-  #Use Rcon to restart server softly.
+  #Use the management API to restart server softly.
   Use        = $true
 
-  #What protocol to use : RCON, ARRCON, Telnet, Websocket, StdIn
-  Protocol   = "ARRCON"
+  #What protocol to use : RCON, ARRCON, Telnet, StdIn, RestAPI
+  Protocol   = "RestAPI"
 
   #Times at which the servers will warn the players that it is about to restart. (in seconds between each timers)
   Timers     = [System.Collections.ArrayList]@(240, 50, 10) #Total wait time is 240+50+10 = 300 seconds or 5 minutes
 
   #message that will be sent. % is a wildcard for the timer.
-  #Palworld's Broadcast command does not accept spaces, use underscores.
-  MessageMin = "The_server_will_restart_in_%_minutes_!"
+  MessageMin = "The server will restart in % minutes !"
 
   #message that will be sent. % is a wildcard for the timer.
-  MessageSec = "The_server_will_restart_in_%_seconds_!"
+  MessageSec = "The server will restart in % seconds !"
 
   #command to send a message.
   CmdMessage = "Broadcast"
@@ -196,6 +208,25 @@ $WarningsDetails = @{
 
   #command to stop the server
   CmdStop    = "Shutdown"
+
+  <#
+  REST API route map, used when Protocol is "RestAPI".
+  The keys of Routes must match the CmdMessage / CmdSave / CmdStop values above.
+  %MESSAGE% is replaced with the message being sent.
+  Reference : https://docs.palworldgame.com/category/rest-api/
+  #>
+  Api        = @{
+    BaseUrl = "http://$($ServerDetails.ManagementIP):$($ServerDetails.RestApiPort)/v1/api"
+    Auth    = "Basic"
+    User    = "admin"
+    #Password defaults to the server's ManagementPassword (the AdminPassword).
+    Routes  = @{
+      Broadcast = @{ Method = "POST"; Path = "announce"; Body = @{ message = "%MESSAGE%" } }
+      Save      = @{ Method = "POST"; Path = "save" }
+      #CmdStop is sent without a message, so this one carries its own text.
+      Shutdown  = @{ Method = "POST"; Path = "shutdown"; Body = @{ waittime = 1; message = "The server is restarting !" } }
+    }
+  }
 }
 #Create the object
 $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
@@ -482,12 +513,13 @@ function Start-ServerPrep {
   $OptionSettings.PublicPort         = "$($Server.Port)"
   $OptionSettings.RCONPort           = "$($Server.ManagementPort)"
   $OptionSettings.Region             = "`"$($Server.Region)`""
-  $OptionSettings.RESTAPIEnabled     = if ($Server.UseRestApi) { "True" } else { "False" }
   $OptionSettings.RESTAPIPort        = "$($Server.RestApiPort)"
 
-  #RCON is only needed when the restart warnings use an RCON based protocol.
+  #Each management interface is only enabled when something actually needs it.
   $UseRcon = $Warnings.Use -and ($Warnings.Protocol -in @("RCON", "ARRCON"))
+  $UseApi = $Server.UseRestApi -or ($Warnings.Use -and $Warnings.Protocol -eq "RestAPI")
   $OptionSettings.RCONEnabled = if ($UseRcon) { "True" } else { "False" }
+  $OptionSettings.RESTAPIEnabled = if ($UseApi) { "True" } else { "False" }
 
   #Build the single line OptionSettings=(...) the game expects.
   $Options = ($OptionSettings.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ","
@@ -502,7 +534,7 @@ function Start-ServerPrep {
   if ($UseRcon) {
     Write-ScriptMsg "RCON listening on port $($Server.ManagementPort) (do not port forward)"
   }
-  if ($Server.UseRestApi) {
+  if ($UseApi) {
     Write-ScriptMsg "REST API listening on port $($Server.RestApiPort) (do not port forward)"
   }
 }

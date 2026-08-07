@@ -264,7 +264,7 @@ $BackupsDetails = @{
 $Backups = New-Object -TypeName PsObject -Property $BackupsDetails
 
 #---------------------------------------------------------
-# Restart Warnings (Require RCON, Telnet or WebSocket API)
+# Restart Warnings (Require RCON, Telnet, StdIn or REST API)
 #---------------------------------------------------------
 
 $WarningsDetails = @{
@@ -272,7 +272,7 @@ $WarningsDetails = @{
   #ASKA does not currently support RCON.
   Use        = $false
 
-  #What protocol to use : RCON, ARRCON, Telnet, Websocket
+  #What protocol to use : RCON, ARRCON, Telnet, StdIn, RestAPI
   Protocol   = "ARRCON"
 
   #Times at which the servers will warn the players that it is about to restart. (in seconds between each timers)

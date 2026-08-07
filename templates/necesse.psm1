@@ -140,7 +140,7 @@ $BackupsDetails = @{
 $Backups = New-Object -TypeName PsObject -Property $BackupsDetails
 
 #---------------------------------------------------------
-# Restart Warnings (Require RCON, Telnet or WebSocket API)
+# Restart Warnings (Require RCON, Telnet, StdIn or REST API)
 #---------------------------------------------------------
 
 $WarningsDetails = @{
@@ -149,7 +149,7 @@ $WarningsDetails = @{
   #host process that keeps that console pipe open across separate script invocations.
   Use        = $true
 
-  #What protocol to use : RCON, ARRCON, Telnet, Websocket, StdIn
+  #What protocol to use : RCON, ARRCON, Telnet, StdIn, RestAPI
   Protocol   = "StdIn"
 
   #Times at which the servers will warn the players that it is about to restart. (in seconds between each timers)
