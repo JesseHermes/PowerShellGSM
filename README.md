@@ -34,6 +34,7 @@ A Comprehensive PowerShell Tool for Simple Automated Game Server Management.
 - Left 4 Dead 2
 - Mordhau
 - Minecraft (Paperclip)
+- Necesse
 - Palworld
 - PixArk
 - Project Zomboid

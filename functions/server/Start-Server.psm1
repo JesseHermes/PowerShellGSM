@@ -12,7 +12,11 @@ function Start-Server {
     #Create a Timestamp
     $timestamp = Get-TimeStamp
     Add-Member -InputObject $Server -Name "StartTime" -Type NoteProperty -Value $timestamp
-    if ($Server.Arguments.length -gt 0) {
+    if ($Warnings.Use -and $Warnings.Protocol -eq "StdIn") {
+      Write-ServerMsg "Starting Server $($Server.Launcher) via StdIn host with Arguments: $($Server.Arguments)"
+      $ServerProcess = Start-StdInHost
+    }
+    elseif ($Server.Arguments.length -gt 0) {
       Write-ServerMsg "Starting Server $($Server.Launcher) with Arguments: $($Server.Arguments)"
       $ServerProcess = Start-Process -FilePath $Server.Launcher -WorkingDirectory $($Server.WorkingDirectory) -ArgumentList $Server.Arguments -PassThru
     }

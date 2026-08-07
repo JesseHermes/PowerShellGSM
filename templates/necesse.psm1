@@ -10,17 +10,14 @@ $ServerDetails = @{
   #Login username used by SteamCMD
   Login              = "anonymous"
 
-  #Path to root Necesse data directory (saves, worlds and configs)
-  DataDirectory     = "$env:APPDATA\Necesse"
-
   #Name of save game to host in data dir \ saves
   World              = "World1"
 
   #Value of $true instructs the server to pause the world when no players are logged in. Value of $false, world continues without players
-  PauseWhenEmpty = $true
+  PauseWhenEmpty     = $true
 
   #Number of player slots to open on the server, default 10
-  PlayerSlots = 10
+  MaxPlayers         = 10
 
   #Password to join the World *NO SPACES*
   Password           = "CHANGEME"
@@ -28,7 +25,7 @@ $ServerDetails = @{
   #Server Port
   Port               = 14159
 
-  #Rcon IP (not supported by Necesse at this time)
+  #Rcon IP (unused, Necesse has no RCON. See Warnings.Protocol = "StdIn" below)
   ManagementIP       = "127.0.0.1"
 
   #Rcon Port
@@ -47,8 +44,8 @@ $ServerDetails = @{
   #Server Installation Path
   Path               = ".\servers\$Name"
 
-  #LEAVE BLANK! Is defined based on value of DataDirectory above
-  ConfigFolder      =  ""
+  #Server configuration folder
+  ConfigFolder       = ".\servers\$Name\cfg"
 
   #Steam Server App Id
   AppID              = 1169370
@@ -115,7 +112,6 @@ $ServerDetails = @{
 }
 #Create the object
 $Server = New-Object -TypeName PsObject -Property $ServerDetails
-$Server.ConfigFolder = "$($Server.DataDirectory)\cfg"
 
 #---------------------------------------------------------
 # Backups
@@ -148,20 +144,22 @@ $Backups = New-Object -TypeName PsObject -Property $BackupsDetails
 #---------------------------------------------------------
 
 $WarningsDetails = @{
-  #Use Rcon to restart server softly. (not supported by Necesse at this time)
-  Use        = $false
+  #Necesse has no RCON, but its console does read commands from StandardInput (the same
+  #console text you'd type manually). "StdIn" routes save/stop commands through a hidden
+  #host process that keeps that console pipe open across separate script invocations.
+  Use        = $true
 
-  #What protocol to use : RCON, ARRCON, Telnet, Websocket
-  Protocol   = "RCON"
+  #What protocol to use : RCON, ARRCON, Telnet, Websocket, StdIn
+  Protocol   = "StdIn"
 
   #Times at which the servers will warn the players that it is about to restart. (in seconds between each timers)
   Timers     = [System.Collections.ArrayList]@(240, 50, 10) #Total wait time is 240+50+10 = 300 seconds or 5 minutes
 
   #message that will be sent. % is a wildcard for the timer.
-  MessageMin = "The server will restart in % minutes !"
+  MessageMin = "The server will restart in % minutes!"
 
   #message that will be sent. % is a wildcard for the timer.
-  MessageSec = "The server will restart in % seconds !"
+  MessageSec = "The server will restart in % seconds!"
 
   #command to send a message.
   CmdMessage = "say"
@@ -170,10 +168,10 @@ $WarningsDetails = @{
   CmdSave    = "save"
 
   #How long to wait in seconds after the save command is sent.
-  SaveDelay  = 15
+  SaveDelay  = 10
 
-  #command to stop the server
-  CmdStop    = "stop"
+  #command to stop the server. "exit" is what saves and closes Necesse cleanly.
+  CmdStop    = "exit"
 }
 #Create the object
 $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
@@ -196,9 +194,9 @@ $ArgumentList = @(
     "-port $($Server.Port) "
     "-world `"$($Server.World)`" "
     "-password `"$($Server.Password)`" "
-    "-datadir `"$($Server.DataDirectory)`" "
+    "-localdir `"$($Server.Path)`" "
     "-pausewhenempty $([int]$Server.PauseWhenEmpty) "
-    "-slots $($Server.PlayerSlots) "
+    "-slots $($Server.MaxPlayers) "
 )
 Add-Member -InputObject $Server -Name "ArgumentList" -Type NoteProperty -Value $ArgumentList
 Add-Member -InputObject $Server -Name "Launcher" -Type NoteProperty -Value "$($Server.Exec)"

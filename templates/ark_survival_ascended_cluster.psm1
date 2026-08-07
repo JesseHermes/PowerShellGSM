@@ -1,6 +1,6 @@
 # This script is meant to allow you to easily setup multiple ASA Servers using shared configurations.
 # Makes sure the json file is in the correct location and the name matches.
-$jsonFilePath = ".\configs\shared\ark_shared.json"
+$jsonFilePath = ".\configs\shared\asa_shared.json"
 $ServerData = Get-Content $jsonFilePath | ConvertFrom-Json
 
 #Server Name, Always Match the Launcher and config file name.
