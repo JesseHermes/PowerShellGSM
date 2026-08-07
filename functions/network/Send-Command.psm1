@@ -139,7 +139,11 @@ function Send-Command {
 
       try {
         $Result = Invoke-RestMethod @Params
-        if ($Result) { Write-Host $Result }
+        #Objects render poorly with Write-Host, show them as compact json instead.
+        if ($Result) {
+          if ($Result -is [string]) { Write-Host $Result }
+          else { Write-Host ($Result | ConvertTo-Json -Depth 5 -Compress) }
+        }
         $Success = $true
       }
       catch {

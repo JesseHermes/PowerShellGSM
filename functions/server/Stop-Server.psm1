@@ -8,7 +8,13 @@ function Stop-Server {
     #Check if it's the right server via RCON if possible.
     $Success = $false
     if ($Warnings.Use) {
-      $Success = Send-Command("help")
+      <#
+      Liveness probe. "help" exists on most RCON and Telnet servers, but an API
+      based protocol has no such command, so a template can name its own harmless
+      read only command with Warnings.CmdCheck.
+      #>
+      $CmdCheck = if ($Warnings.CmdCheck) { $Warnings.CmdCheck } else { "help" }
+      $Success = Send-Command -Command $CmdCheck
       if ($Success) {
         Write-ServerMsg "Server is responding to remote messages."
       }

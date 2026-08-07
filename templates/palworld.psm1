@@ -210,8 +210,15 @@ $WarningsDetails = @{
   CmdStop    = "Shutdown"
 
   <#
+  Command used to check that the server is alive and the credentials work.
+  Defaults to "help" when omitted, which most RCON and Telnet servers accept
+  but the REST API does not, so point it at a harmless read only endpoint.
+  #>
+  CmdCheck   = "Info"
+
+  <#
   REST API route map, used when Protocol is "RestAPI".
-  The keys of Routes must match the CmdMessage / CmdSave / CmdStop values above.
+  The keys of Routes must match the CmdMessage / CmdSave / CmdStop / CmdCheck values above.
   %MESSAGE% is replaced with the message being sent.
   Reference : https://docs.palworldgame.com/category/rest-api/
   #>
@@ -221,6 +228,8 @@ $WarningsDetails = @{
     User    = "admin"
     #Password defaults to the server's ManagementPassword (the AdminPassword).
     Routes  = @{
+      #Read only, used as the liveness probe. Also proves the password is right.
+      Info      = @{ Method = "GET"; Path = "info" }
       Broadcast = @{ Method = "POST"; Path = "announce"; Body = @{ message = "%MESSAGE%" } }
       Save      = @{ Method = "POST"; Path = "save" }
       #CmdStop is sent without a message, so this one carries its own text.
