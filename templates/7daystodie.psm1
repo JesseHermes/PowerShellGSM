@@ -170,10 +170,13 @@ $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
 # Launch Arguments
 #---------------------------------------------------------
 
+#Dynamic property
+Add-Member -InputObject $Server -Name "ConfigFile" -Type NoteProperty -Value "$($Server.ConfigFolder)\serverconfig.xml"
+
 #Launch Arguments
 $ArgumentList = @(
   "-logfile $($Server.LogFile) ",
-  "-configfile=$($Server.ConfigFolder)\serverconfig.xml ",
+  "-configfile=$($Server.ConfigFile) ",
   "-batchmode ",
   "-nographics ",
   "-dedicated ",
@@ -193,13 +196,12 @@ function Start-ServerPrep {
   Write-ScriptMsg "Port Forward : 26900 in TCP and 26900 to 26903 in UDP to $($Global.InternalIP)"
 
   #Copy Config File if not created. Do not modify the one in the server directory, it will be overwriten on updates.
-  $ConfigFile = "$($Server.ConfigFolder)\serverconfig.xml"
-  $ConfigFilePath = Split-Path -Path $ConfigFile
+  $ConfigFilePath = Split-Path -Path $Server.ConfigFile
   if (-not (Test-Path -Path $ConfigFilePath -ErrorAction SilentlyContinue)) {
     New-Item -ItemType "directory" -Path $ConfigFilePath -Force -ErrorAction SilentlyContinue
   }
-  If (-not (Test-Path -Path $ConfigFile -PathType "leaf" -ErrorAction SilentlyContinue)) {
-    Copy-Item -Path "$($Server.Path)\serverconfig.xml" -Destination $ConfigFile -Force -ErrorAction SilentlyContinue
+  If (-not (Test-Path -Path $Server.ConfigFile -PathType "leaf" -ErrorAction SilentlyContinue)) {
+    Copy-Item -Path "$($Server.Path)\serverconfig.xml" -Destination $Server.ConfigFile -Force -ErrorAction SilentlyContinue
   }
 
 }
