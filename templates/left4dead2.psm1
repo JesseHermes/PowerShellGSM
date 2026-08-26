@@ -32,9 +32,6 @@ $ServerDetails = @{
   #Map
   Map                = "c1m1_hotel"
 
-  #Configuration File
-  ConfigFile         = "server.cfg"
-
   #Rcon IP
   ManagementIP       = "127.0.0.1"
 
@@ -188,6 +185,9 @@ $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
 # Launch Arguments
 #---------------------------------------------------------
 
+#Dynamic property
+Add-Member -InputObject $Server -Name "ConfigFile" -Type NoteProperty -Value "server.cfg"
+
 #Launch Arguments
 $ArgumentList = @(
   "-console ",
@@ -250,11 +250,10 @@ $FileContent = ($FileContentList -join "`n")
 
 function Start-ServerPrep {
 
-
   #Copy Config File if not created. Do not modify the one in the server directory, it will be overwriten on updates.
-  if (-not (Test-Path -Path ".\servers\$($Server.Name)\left4dead2\cfg\$($Server.ConfigFile)" -ErrorAction SilentlyContinue)) {
+  if (-not (Test-Path -Path "$($Server.ConfigFolder)\$($Server.ConfigFile)" -ErrorAction SilentlyContinue)) {
     Write-Host "Creating Config File"
-    New-Item -Path ".\servers\$($Server.Name)\left4dead2\cfg\" -Name "$($Server.ConfigFile)" -ItemType "file" -Value $FileContent
+    New-Item -Path $Server.ConfigFolder -Name "$($Server.ConfigFile)" -ItemType "file" -Value $FileContent
   }
 
   Write-ScriptMsg "Port Forward : $($Server.Port) in TCP and UDP to $($Global.InternalIP)"
