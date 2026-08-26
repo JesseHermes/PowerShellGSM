@@ -26,12 +26,6 @@ $ServerDetails = @{
   #Beacon Port
   Beaconport         = 15000
 
-  #Modified Game.ini
-  GameIni            = ".\servers\Mordhau\Mordhau\Saved\Config\WindowsServer\Game2.ini"
-
-  #Modified Engine.ini
-  EngineIni          = ".\servers\Mordhau\Mordhau\Saved\Config\WindowsServer\Engine2.ini"
-
   #Rcon IP
   ManagementIP       = "127.0.0.1"
 
@@ -186,8 +180,8 @@ $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
 #---------------------------------------------------------
 
 #Address parsing and slash flipping
-$Server.GameIni = (Resolve-CompletePath -Path $Server.GameIni -ParentPath ".\servers\") -replace '\\', '/'
-$Server.EngineIni = (Resolve-CompletePath -Path $Server.EngineIni -ParentPath ".\servers\") -replace '\\', '/'
+Add-Member -InputObject $Server -Name "GameIni" -Type NoteProperty -Value ((Resolve-CompletePath -Path "$($Server.ConfigFolder)\Game2.ini" -ParentPath ".\servers\") -replace '\\', '/')
+Add-Member -InputObject $Server -Name "EngineIni" -Type NoteProperty -Value ((Resolve-CompletePath -Path "$($Server.ConfigFolder)\Engine2.ini" -ParentPath ".\servers\") -replace '\\', '/')
 
 #Launch Arguments
 $ArgumentList = @(
