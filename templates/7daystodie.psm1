@@ -14,9 +14,6 @@ $ServerDetails = @{
   #Login username used by SteamCMD
   Login              = "anonymous"
 
-  #Server Configuration
-  ConfigFile         = "$Env:userprofile\AppData\Roaming\7DaysToDie\Saves\serverconfig.xml"
-
   #Rcon IP, usually localhost
   ManagementIP       = "127.0.0.1"
 
@@ -176,7 +173,7 @@ $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
 #Launch Arguments
 $ArgumentList = @(
   "-logfile $($Server.LogFile) ",
-  "-configfile=$($Server.ConfigFile) ",
+  "-configfile=$($Server.ConfigFolder)\serverconfig.xml ",
   "-batchmode ",
   "-nographics ",
   "-dedicated ",
@@ -196,12 +193,13 @@ function Start-ServerPrep {
   Write-ScriptMsg "Port Forward : 26900 in TCP and 26900 to 26903 in UDP to $($Global.InternalIP)"
 
   #Copy Config File if not created. Do not modify the one in the server directory, it will be overwriten on updates.
-  $ConfigFilePath = Split-Path -Path $Server.ConfigFile
+  $ConfigFile = "$($Server.ConfigFolder)\serverconfig.xml"
+  $ConfigFilePath = Split-Path -Path $ConfigFile
   if (-not (Test-Path -Path $ConfigFilePath -ErrorAction SilentlyContinue)) {
     New-Item -ItemType "directory" -Path $ConfigFilePath -Force -ErrorAction SilentlyContinue
   }
-  If (-not (Test-Path -Path $Server.ConfigFile -PathType "leaf" -ErrorAction SilentlyContinue)) {
-    Copy-Item -Path "$($Server.Path)\serverconfig.xml" -Destination $Server.ConfigFile -Force -ErrorAction SilentlyContinue
+  If (-not (Test-Path -Path $ConfigFile -PathType "leaf" -ErrorAction SilentlyContinue)) {
+    Copy-Item -Path "$($Server.Path)\serverconfig.xml" -Destination $ConfigFile -Force -ErrorAction SilentlyContinue
   }
 
 }
