@@ -196,6 +196,9 @@ $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
 # Launch Arguments
 #---------------------------------------------------------
 
+#Dynamic property
+Add-Member -InputObject $Server -Name "ConfigFile" -Type NoteProperty -Value "server.properties"
+
 #Launch Arguments
 $ArgumentList = @(
   "-Xms$($Server.Ram)G ",
@@ -236,9 +239,9 @@ $FileContent = ($FileContentList -join "`n")
 function Start-ServerPrep {
 
   #Create Config File if not created.
-  if (-not (Test-Path -Path ".\servers\$($Server.Name)\server.properties" -ErrorAction SilentlyContinue)) {
+  if (-not (Test-Path -Path "$($Server.ConfigFolder)\$($Server.ConfigFile)" -ErrorAction SilentlyContinue)) {
     Write-Host "Creating Config File"
-    New-Item -Path ".\servers\$($Server.Name)\" -Name "server.properties" -ItemType "file" -Value $FileContent
+    New-Item -Path "$($Server.ConfigFolder)\" -Name $Server.ConfigFile -ItemType "file" -Value $FileContent
   }
   #Create eula File if not created.
   if (-not (Test-Path -Path ".\servers\$($Server.Name)\eula.txt" -ErrorAction SilentlyContinue)) {

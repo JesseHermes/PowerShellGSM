@@ -14,9 +14,6 @@ $ServerDetails = @{
   #Login username used by SteamCMD
   Login              = "anonymous"
 
-  # Specifies the configuration file to use *(relative the the game)
-  ConfigFile         = "serverconfig.txt"
-
   # Specifies the port to listen on.
   Port               = 7777
 
@@ -185,6 +182,10 @@ $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
 # Launch Arguments
 #---------------------------------------------------------
 
+#Dynamic property
+# Specifies the configuration file to use *(relative the the game exe, or absolute path)
+Add-Member -InputObject $Server -Name "ConfigFile" -Type NoteProperty -Value (Resolve-CompletePath -Path "$($Server.ConfigFolder)\serverconfig.txt" -ParentPath ".\servers\")
+
 #Launch Arguments
 $ArgumentList = @(
   "-config `"$($Server.ConfigFile)`" ",
@@ -227,7 +228,7 @@ function Start-ServerPrep {
     Copy-Item -Path ".\downloads\terraria\$($Server.Version)\Windows\TerrariaServer.exe" -Destination $Server.Path -Force
     Copy-Item -Path ".\downloads\terraria\$($Server.Version)\Windows\ReLogic.Native.dll" -Destination $Server.Path -Force
     if (-not (Test-Path -Path $Server.ConfigFile -PathType "leaf" -ErrorAction SilentlyContinue)) {
-      Copy-Item -Path ".\downloads\terraria\$($Server.Version)\Windows\serverconfig.txt" -Destination $Server.Path
+      Copy-Item -Path ".\downloads\terraria\$($Server.Version)\Windows\serverconfig.txt" -Destination $Server.ConfigFile
     }
     #Cleanup
     Remove-Item -Path ".\downloads" -Recurse -Force -ErrorAction SilentlyContinue

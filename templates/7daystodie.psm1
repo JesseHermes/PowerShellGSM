@@ -14,9 +14,6 @@ $ServerDetails = @{
   #Login username used by SteamCMD
   Login              = "anonymous"
 
-  #Server Configuration
-  ConfigFile         = "$Env:userprofile\AppData\Roaming\7DaysToDie\Saves\serverconfig.xml"
-
   #Rcon IP, usually localhost
   ManagementIP       = "127.0.0.1"
 
@@ -172,6 +169,9 @@ $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
 #---------------------------------------------------------
 # Launch Arguments
 #---------------------------------------------------------
+
+#Dynamic property
+Add-Member -InputObject $Server -Name "ConfigFile" -Type NoteProperty -Value "$($Server.ConfigFolder)\serverconfig.xml"
 
 #Launch Arguments
 $ArgumentList = @(
