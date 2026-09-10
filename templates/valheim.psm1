@@ -20,7 +20,7 @@ $ServerDetails = @{
   Password           = "CHANGEME"
 
   #Server Port
-  Port               = 2459
+  Port               = 2456
 
   #Rcon IP (not supported by valheim yet.)
   ManagementIP       = "127.0.0.1"
@@ -160,13 +160,13 @@ $WarningsDetails = @{
   CmdMessage = "say"
 
   #command to save the server
-  CmdSave    = "saveworld"
+  CmdSave    = "save"
 
   #How long to wait in seconds after the save command is sent.
   SaveDelay  = 15
 
-  #command to stop the server
-  CmdStop    = "shutdown"
+  #command to stop the server - Valheim does not have a stop command
+  CmdStop    = "CmdStop"
 }
 #Create the object
 $Warnings = New-Object -TypeName PsObject -Property $WarningsDetails
@@ -196,7 +196,7 @@ Add-Member -InputObject $Server -Name "WorkingDirectory" -Type NoteProperty -Val
 
 function Start-ServerPrep {
 
-  Write-ScriptMsg "Port Forward : $($Server.Port) to $($Server.Port + 2) in TCP and UDP to $($Global.InternalIP)"
+  Write-ScriptMsg "Port Forward : $($Server.Port) & $($Server.Port + 2) in UDP to $($Global.InternalIP)"
 
 }
 
