@@ -284,8 +284,9 @@ function Start-ServerPrep {
   <#
   YOU MUST EDIT THE CONFIGURATION BELOW AS THE FILE WILL BE OVERWRITTEN AT EACH LAUNCH.
 
-  Values below are the Palworld v1.0 defaults, in the same order as the game's own
-  DefaultPalWorldSettings.ini. Booleans must be the literal text True or False.
+  Values below are the stock defaults from the game's own DefaultPalWorldSettings.ini
+  (synced from dedicated server build 25080279, 2026-09-07), kept in the same order
+  as that file. Booleans must be the literal text True or False.
   Reference : https://docs.palworldgame.com/settings-and-operation/configuration
 
   Entries marked "MANAGED" are overwritten further down from the Server Configuration
@@ -447,8 +448,11 @@ function Start-ServerPrep {
 
     #--- Performance ----------------------------------------------------------
 
-    #Per player building cap, 0 = unlimited.
+    #Overall building cap, 0 = unlimited.
     MaxBuildingLimitNum                         = "0"
+
+    #Per player building cap, 0 = unlimited.
+    MaxBuildingLimitNumPerPlayer                = "0"
 
     #Pal sync distance from players in cm. Minimum 5000, maximum 15000.
     ServerReplicatePawnCullDistance             = "15000.000000"
@@ -465,6 +469,9 @@ function Start-ServerPrep {
     PlayerDataPalStorageUpdateCheckTickInterval = "1.000000"
     ItemCorruptionMultiplier                    = "1.000000"
     MonsterFarmActionSpeedRate                  = "1.000000"
+
+    #Fishing minigame difficulty, 0.1 to 1.0.
+    FishingDifficultyRate                       = "1.000000"
 
     #Comma separated technology ids to forbid, empty to allow everything.
     #Written unquoted, the game ships this as a bare empty value.
@@ -509,6 +516,11 @@ function Start-ServerPrep {
 
     bEnableBuildingPlayerUIdDisplay             = "False"
     BuildingNameDisplayCacheTTLSeconds          = "60"
+
+    #--- Spawning --------------------------------------------------------------
+
+    #Allow enemy camps to spawn near player base camps.
+    bAllowEnemyCampSpawnNearBaseCamp            = "False"
   }
 
   # YOU MUST EDIT THE CONFIGURATION ABOVE AS THE FILE WILL BE OVERWRITTEN AT EACH LAUNCH.
