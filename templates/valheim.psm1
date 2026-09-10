@@ -196,7 +196,7 @@ Add-Member -InputObject $Server -Name "WorkingDirectory" -Type NoteProperty -Val
 
 function Start-ServerPrep {
 
-  Write-ScriptMsg "Port Forward : $($Server.Port) UDP to $($Global.InternalIP)"
+  Write-ScriptMsg "Port Forward : $($Server.Port) & $($Server.Port + 2) in UDP to $($Global.InternalIP)"
 
 }
 
